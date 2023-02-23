@@ -22,7 +22,11 @@ for i in range(len(istasyon_adlari_list)):
     total_prod_list.append(loc_df)
 istasyon_adlari_list.insert(0,'Tümü')
 
-
+perf_df2 = df.groupby(['Çalışma Grubu', 'Ürün Grubu']).mean()
+perf_df2.reset_index(inplace=True)
+perf_df2['Sağlam(dz)'] = perf_df2['Sağlam(dz)'].apply(lambda x : float("{:.2f}".format(x)))
+perf_df2 = perf_df2.drop(columns=['Unnamed: 0', 'Miktar (kg.)', 'Yıl', 'Hafta'])
+print(perf_df2.head(10))
 
 app = Dash(external_stylesheets=[dbc.themes.LITERA])
 
@@ -50,7 +54,8 @@ app.layout = html.Div([
                 dcc.Tab(label='Günlük Üretim Takibi', value='gunluk-tab')
             ]),
             html.Div(id='tabs-content'),
-            html.Div(id='data-content-table')
+            html.Div(id='data-content-table'),
+            html.Div(id='performance-analysis')
         ])
     ], justify='center')
 ])   
@@ -92,7 +97,6 @@ def datatable_maker(val):
     if val == 'gunluk-tab':
         yesterday = dt.date.today() - dt.timedelta(days=1)
         yesterday = yesterday.strftime('%Y-%m-%d')
-        print(df.head(5))
         datatable_df = df.loc[df['Tarih'] == yesterday]
         datatable_df = datatable_df.drop(['Unnamed: 0', 'Model Ad', 'Yıl', 'Hafta'], axis=1) 
         datatable_df = datatable_df.sort_values('İstasyon Adı')
@@ -130,6 +134,40 @@ def datatable_maker(val):
                 ],align='center')
             ], style={'text-align':'center'})
         ])
+
+@app.callback(Output('performance-analysis','children'),
+              Input('tarih-tabs','value'))
+def performance_analyzer(val):
+    if val == 'gunluk-tab':
+        perf_df = df
+        perf_df = perf_df.groupby(by='Ürün Grubu').sum()
+        perf_df.append({'Ürün Grubu': ['Toplam'],
+                        'Sağlam(dz)': [perf_df['Sağlam(dz)'].sum()],
+                        'Miktar(kg)': [perf_df['Miktar (kg.)'].sum()]}, ignore_index=True)
+        perf_df.reset_index(inplace=True)
+
+
+        return html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.H2('2023 Performans Analizi'),
+                    dash_table.DataTable(data=perf_df.to_dict('records'),
+                                         columns=[
+                                            {'name': 'Ürün Grubu', 'id': 'Ürün Grubu'},
+                                            {'name': 'Sağlam(dz)', 'id': 'Sağlam(dz)'},
+                                            {'name': 'Miktar(kg)', 'id': 'Miktar (kg.)'}
+                    ]),
+                    html.H2('2023 Vardiyaya Göre Ürünleri Gruplandırarak Yapılan Performans Analizi'),
+                    dash_table.DataTable(data=perf_df2.to_dict('records'),
+                                        columns=[
+                                            {'name': 'Çalışma Grubu', 'id': 'Çalışma Grubu'},
+                                            {'name': 'Ürün Grubu', 'id': 'Ürün Grubu'},
+                                            {'name': 'Sağlam(dz)', 'id': 'Sağlam(dz)'}
+                                        ])
+                ])
+            ], style={'text-align': 'center'})
+        ])
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)

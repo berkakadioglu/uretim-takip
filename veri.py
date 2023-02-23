@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import datetime
-df = pd.read_csv('uretim3.csv')
+df = pd.read_csv('uretim6.csv')
 df['Tarih'] = pd.to_datetime(df['Tarih'])
 df.loc[df['Ürün Grubu'] == 'SNİCKERS', 'Ürün Grubu'] = 'Patik'
 df.loc[df['Ürün Grubu'] == 'BAYAN KISAKONC', 'Ürün Grubu'] = 'Kısa Konç'
@@ -16,6 +16,7 @@ df.loc[df['Ürün Grubu'] == 'BAYAN BAMBU BABET', 'Ürün Grubu'] = 'Babet'
 df.loc[df['Ürün Grubu'] == 'SOKET TENİS', 'Ürün Grubu'] = 'Soket'
 df.loc[df['Ürün Grubu'] == 'HAVLU DİZALTI', 'Ürün Grubu'] = 'Havlu Dizaltı'
 df.loc[df['Ürün Grubu'] == 'BAYAN ERKEK KISAKONC HAVLU', 'Ürün Grubu'] = 'Kısa Konç'
+df.loc[df['Ürün Grubu'] == 'SOKET ERKEK', 'Ürün Grubu'] = 'Soket'
 
 df['Yıl'] = df['Tarih'].dt.isocalendar()['year']
 df['Hafta'] = df['Tarih'].dt.isocalendar()['week']
