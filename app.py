@@ -30,17 +30,6 @@ print(perf_df2.head(10))
 
 app = Dash(external_stylesheets=[dbc.themes.LITERA])
 
-week_interval = {'2 Ocak 2023 - 8 Ocak 2023': 1,
-                 '9 Ocak 2023 - 15 Ocak 2023': 2,
-                 '16 Ocak 2023 - 22 Ocak 2023': 3,
-                 '23 Ocak 2023 - 29 Ocak 2023': 4,
-                 '30 Ocak 2023 - 5 Şubat 2023': 5,
-                 '6 Şubat 2023 - 12 Şubat 2023': 6,
-                 '13 Şubat 2023 - 19 Şubat 2023': 7,
-                 '20 Şubat 2023 - 26 Şubat 2023': 8}
-
-monthly_interval = {'Ocak':1000, 'Şubat': 1001, 'Mart': 1002}
-
 app.layout = html.Div([
     dbc.Row([
         dbc.Col([
